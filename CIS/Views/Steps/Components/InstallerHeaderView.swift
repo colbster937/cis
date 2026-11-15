@@ -8,6 +8,7 @@
 internal import AppKit
 
 internal final class InstallerHeaderView: NSView {
+    private let accentColor: NSColor
 
     // MARK: Views
 
@@ -61,6 +62,7 @@ internal final class InstallerHeaderView: NSView {
     // MARK: Setup
 
     init(dmg: DMG) {
+        accentColor = dmg.color ?? .systemPink
         super.init(frame: .zero)
 
         gradientLayer.colors = [
@@ -70,6 +72,7 @@ internal final class InstallerHeaderView: NSView {
         iconImageView.image = dmg.icon ?? NSApp.applicationIconImage
 
         setupView()
+        updateColors()
     }
 
     required init?(coder: NSCoder) {
@@ -83,7 +86,6 @@ internal final class InstallerHeaderView: NSView {
 
     private func setupView() {
         self.wantsLayer = true
-        self.layer?.backgroundColor = NSColor.white.cgColor
 
         gradientBackgroundView.layer?.addSublayer(gradientLayer)
 
@@ -109,5 +111,20 @@ internal final class InstallerHeaderView: NSView {
 
             descriptionLabel.leadingAnchor.constraint(equalTo: textStackView.leadingAnchor, constant: 8)
         ])
+    }
+
+    override func viewDidChangeEffectiveAppearance() {
+        super.viewDidChangeEffectiveAppearance()
+        updateColors()
+    }
+
+    private func updateColors() {
+        effectiveAppearance.performAsCurrentDrawingAppearance {
+            let background = effectiveAppearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua
+                ? NSColor.windowBackgroundColor : .white
+
+            layer?.backgroundColor = background.cgColor
+            gradientLayer.colors = [accentColor.cgColor, background.cgColor]
+        }
     }
 }

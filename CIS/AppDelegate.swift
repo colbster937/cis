@@ -90,7 +90,6 @@ internal final class AppDelegate: NSObject, NSApplicationDelegate {
             } else {
                 window.contentViewController = InstallerViewController(dmg: dmg)
                 window.title = .l(.setup(appName: dmg.name))
-                window.appearance = NSAppearance(named: .aqua)
             }
 
             window.center()

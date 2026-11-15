@@ -8,6 +8,31 @@
 internal import AppKit
 
 internal class WizardStepViewController: NSViewController {
+    private final class WizardBackgroundView: NSView {
+        override init(frame: NSRect) {
+            super.init(frame: frame)
+            wantsLayer = true
+            updateBackground()
+        }
+
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+
+        override func viewDidChangeEffectiveAppearance() {
+            super.viewDidChangeEffectiveAppearance()
+            updateBackground()
+        }
+
+        private func updateBackground() {
+            effectiveAppearance.performAsCurrentDrawingAppearance {
+                let background = effectiveAppearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua
+                    ? NSColor.windowBackgroundColor : .white
+
+                layer?.backgroundColor = background.cgColor
+            }
+        }
+    }
 
     // MARK: Views
 
@@ -60,9 +85,7 @@ internal class WizardStepViewController: NSViewController {
     }
 
     internal override func loadView() {
-        self.view = NSView()
-        self.view.wantsLayer = true
-        self.view.layer?.backgroundColor = NSColor.white.cgColor
+        self.view = WizardBackgroundView(frame: .zero)
 
         [sidebarBackgroundView, splashImageView, iconImageView, titleLabel, descriptionLabel].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
